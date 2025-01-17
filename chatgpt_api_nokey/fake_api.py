@@ -9,6 +9,7 @@ Description: file content
 
 from .config import *
 
+import ssl
 import time
 import json
 import html2text
@@ -20,15 +21,16 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 
-def stringTokenNum(string: str, encoding_name: str = "cl100k_base") -> int:
-    """Returns the number of tokens in a text string."""
-    encoding = tiktoken.get_encoding(encoding_name)
-    num_tokens = len(encoding.encode(string))
-    return num_tokens
+# def stringTokenNum(string: str, encoding_name: str = "cl100k_base") -> int:
+#     """Returns the number of tokens in a text string."""
+#     encoding = tiktoken.get_encoding(encoding_name)
+#     num_tokens = len(encoding.encode(string))
+#     return num_tokens
 
 class FakeAPI(object):
 
     def __init__(self, headless=HEADLESS, proxy=PROXY, header=HEADER):
+        ssl._create_default_https_context = ssl._create_unverified_context # probably something dumb for my macbook, but i need this for it to open
         self.logger = logging.getLogger('FakeAPI')
         self.logger.addHandler(cil_handler)
         self.url = 'https://chat.openai.com/'
@@ -67,7 +69,8 @@ class FakeAPI(object):
                     continue
                 self.driver.add_cookie(cookie)
             self.driver.get(self.url)
-            self.skipHint()
+            # self.skipHint() 
+            # seems like hint isn't in this update
         else:
             input('Please login and press Enter to continue...\nIf HEADLESS is True, please set it to False for the first time.')
             self.saveCookies()
@@ -76,6 +79,7 @@ class FakeAPI(object):
         hintFlag = True
         while hintFlag:
             buttons = self.getButtons()
+            print('at buttons')
             for button in buttons:
                 if button.text == 'Next':
                     button.click()
@@ -103,12 +107,11 @@ class FakeAPI(object):
         return self.driver.find_elements(by=By.CLASS_NAME, value="btn")
 
     def getTextInput(self):
-        areas = self.driver.find_elements(by=By.TAG_NAME, value="textarea")
+        areas = self.driver.find_elements(by=By.CSS_SELECTOR, value="div[contenteditable='true']")
         while len(areas) == 0:
-            self.logger.warning('No textarea found, refreshing...')
+            self.logger.warning('No contenteditable element found, refreshing...')
             self.driver.refresh()
-            # time.sleep(0.2)
-            areas = self.driver.find_elements(by=By.TAG_NAME, value="textarea")
+            areas = self.driver.find_elements(by=By.CSS_SELECTOR, value="div[contenteditable='true']")
         return areas[0]
 
     # FIXME: Answer sometimes mismatched
@@ -121,7 +124,8 @@ class FakeAPI(object):
             return html2text.HTML2Text().handle(ans[-1])
 
     def getAnswerDivs(self, toJson=False):
-        xpath = "//div[contains(@class, 'markdown prose w-full break-words dark:prose-invert light')]"
+        # xpath = "//div[contains(@class, 'markdown prose w-full break-words dark:prose-invert light')]"
+        xpath = "//div[@class='ProseMirror']"
         elements = self.driver.find_elements(by=By.XPATH, value=xpath)
         if toJson:
             return [BeautifulSoup(element.get_attribute('innerHTML'), 'html.parser').prettify() for element in elements]

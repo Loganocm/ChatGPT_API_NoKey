@@ -26,8 +26,16 @@ For short term, you can modify the source code of undetected-chromedriver in `__
 392            elif self.patcher.version_main >= 108:
 393                options.add_argument("--headless=new")
 """
+'''
+
+this is the old header that was used for this bot. i've updated it with my personal
+mac os headers.
+
 HEADER = "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) \
     AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1"
+'''
+HEADER = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) \
+    AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 SERVER_ADDRESS = ('', 5000)         # Server address (i.e. openai.api_base="http://localhost:5000")
 PROXY = None                        # Proxy used to access ChatGPT
 # PROXY = "http://127.0.0.1:7890"   # If global proxy is set, you can leave it as None
@@ -35,7 +43,7 @@ PROXY = None                        # Proxy used to access ChatGPT
 
 def FakeAPIExample():
     api = FakeAPI(HEADLESS, PROXY, HEADER)
-    print(api.request("Hello!"))
+    print(api.request("helloooo"))
 
 
 def SingleThreadServerExample():
@@ -58,6 +66,7 @@ def SingleThreadServerExample():
 if __name__ == "__main__":
     # Example
     FakeAPIExample()
+    time.sleep(5) # close 5s after req made
     # SingleThreadServerExample()
     
     # Launch Server

@@ -43,7 +43,7 @@ PROXY = None                        # Proxy used to access ChatGPT
 
 def FakeAPIExample():
     api = FakeAPI(HEADLESS, PROXY, HEADER)
-    print(api.request("helloooo"))
+    print(api.request("sup"))
 
 
 def SingleThreadServerExample():
@@ -66,9 +66,9 @@ def SingleThreadServerExample():
 if __name__ == "__main__":
     # Example
     FakeAPIExample()
-    time.sleep(5) # close 5s after req made
+    time.sleep(15)  # close 5s after req made
     # SingleThreadServerExample()
-    
+
     # Launch Server
     # SingleThreadServer(HEADLESS, PROXY, HEADER, SERVER_ADDRESS)
     

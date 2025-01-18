@@ -33,7 +33,7 @@ class FakeAPI(object):
         ssl._create_default_https_context = ssl._create_unverified_context # probably something dumb for my macbook, but i need this for it to open
         self.logger = logging.getLogger('FakeAPI')
         self.logger.addHandler(cil_handler)
-        self.url = 'https://chat.openai.com/'
+        self.url = 'https://chatgpt.com/?temporary-chat=true'
 
         # Configure the Chrome options
         chrome_options = uc.ChromeOptions()
@@ -124,9 +124,8 @@ class FakeAPI(object):
             return html2text.HTML2Text().handle(ans[-1])
 
     def getAnswerDivs(self, toJson=False):
-        # xpath = "//div[contains(@class, 'markdown prose w-full break-words dark:prose-invert light')]"
-        xpath = "//div[@class='ProseMirror']"
-        elements = self.driver.find_elements(by=By.XPATH, value=xpath)
+
+        elements = self.driver.find_elements(by=By.XPATH, value="//DIV[contains(@class, 'markdown prose w-full break-words dark:prose-invert dark')]//p")
         if toJson:
             return [BeautifulSoup(element.get_attribute('innerHTML'), 'html.parser').prettify() for element in elements]
         else:
@@ -176,7 +175,7 @@ class FakeAPI(object):
             textInput = self.getTextInput()
             textInput.send_keys(chatText)
             textInput.submit()
-            time.sleep(0.2)
+            time.sleep(2)
         answer = self.getLatestAnswer()
         if len(self.getAnswerDivs()) > refreshlimit:
             self.logger.info('Webpage answer limit reached, refreshing...')

@@ -114,14 +114,26 @@ class FakeAPI(object):
             areas = self.driver.find_elements(by=By.CSS_SELECTOR, value="div[contenteditable='true']")
         return areas[0]
 
-    # FIXME: Answer sometimes mismatched
     def getLatestAnswer(self):
-        """Get the latest answer from the answer divs."""
-        ans = self.getAnswerDivs(toJson=True)
-        if ans:
-            # 将HTML富文本转换为Markdown
-            # FIXME: This method is not perfect.
-            return html2text.HTML2Text().handle(ans[-1])
+        """Get the latest answer with markdown preserved."""
+        try:
+            elements = self.driver.find_elements(By.XPATH,
+                                                 "//div[contains(@class, 'markdown prose w-full break-words')]")
+            if elements:
+                last_element_html = elements[-1].get_attribute('innerHTML')
+
+                converter = html2text.HTML2Text()
+                converter.ignore_links = False
+                converter.ignore_images = False
+                markdown = converter.handle(last_element_html)
+
+                return markdown.strip()
+            else:
+                self.logger.warning("No response elements found.")
+                return None
+        except Exception as e:
+            self.logger.error(f"Error fetching the latest answer: {e}")
+            return None
 
     def getAnswerDivs(self, toJson=False):
         xpath = "//DIV[contains(@class, 'markdown prose w-full break-words')]//p"

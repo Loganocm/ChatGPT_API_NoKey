@@ -124,7 +124,7 @@ class FakeAPI(object):
             return html2text.HTML2Text().handle(ans[-1])
 
     def getAnswerDivs(self, toJson=False):
-        xpath = "//DIV[contains(@class, 'markdown prose w-full break-words dark:prose-invert dark')]//p"
+        xpath = "//DIV[contains(@class, 'markdown prose w-full break-words')]//p"
         elements = self.driver.find_elements(by=By.XPATH, value=xpath)
         if toJson:
             return [BeautifulSoup(element.get_attribute('innerHTML'), 'html.parser').prettify() for element in elements]

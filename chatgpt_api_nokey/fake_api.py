@@ -33,7 +33,7 @@ class FakeAPI(object):
         ssl._create_default_https_context = ssl._create_unverified_context # probably something dumb for my macbook, but i need this for it to open
         self.logger = logging.getLogger('FakeAPI')
         self.logger.addHandler(cil_handler)
-        self.url = 'https://chatgpt.com/?temporary-chat=true'
+        self.url = 'https://chatgpt.com/'
 
         # Configure the Chrome options
         chrome_options = uc.ChromeOptions()
